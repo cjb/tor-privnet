@@ -2,12 +2,23 @@
 
 #set -e
 
+## Trivial script to set up a private Tor network.
+
+## This many authorities/relays/clients will be started
 AUTHORITIES=3
 RELAYS=15
 CLIENTS=1
 
+## Find the executables here
 TOR=/path/to/tor
 GENCERT=/path/to/tor-gencert
+
+## If you want to run with a lowered ulimit -n to make sure
+## you're not accidentally wasting your resources, set the
+## ConnLimit config value here so that Tor still starts. This
+## must be substantially higher than the number auf authorities
+## + relays.
+CONNLIMIT=90
 
 #################################################################
 
@@ -71,11 +82,12 @@ while [ $NUM -gt 0 ]; do
 	DataDirectory $path
 	Log notice file $path/notice.log
 	Nickname authority$NUM
+	RunAsDaemon 1
 	SocksPort 0
 	OrPort $ORPORT
 	Address 127.0.0.1
 	DirPort $DIRPORT
-	ConnLimit 90
+	ConnLimit $CONNLIMIT
 	AuthoritativeDirectory 1
 	V3AuthoritativeDirectory 1
 	ContactInfo auth$NUM@test.test
@@ -103,9 +115,10 @@ while [ $NUM -gt 0 ]; do
 	DataDirectory $path
 	Log notice file $path/notice.log
 	Nickname relay$NUM
+	RunAsDaemon 1
 	SocksPort 0
 	OrPort $ORPORT
-	ConnLimit 90
+	ConnLimit $CONNLIMIT
 	Address 127.0.0.1
 	DirPort $DIRPORT
 	$DIRSERVER_LINE
@@ -129,7 +142,8 @@ while [ $NUM -gt 0 ]; do
 	cat <<-EOF >$path/torrc
 	TestingTorNetwork 1
 	DataDirectory $path
-	ConnLimit 90
+	RunAsDaemon 1
+	ConnLimit $CONNLIMIT
 	Log notice file $path/notice.log
 	SocksPort $SOCKSPORT
 	$DIRSERVER_LINE
