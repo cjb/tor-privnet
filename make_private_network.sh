@@ -155,5 +155,5 @@ done
 
 cd $WD
 
-find . -name torrc -exec bash -c "$TOR -f {} &" \;
+find . -name torrc -exec bash -c "$TOR -f $WD/{} &" \;
 
