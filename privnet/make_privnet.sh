@@ -137,9 +137,3 @@ while [ $NUM -gt 0 ]; do
 
 	let NUM=$NUM-1
 done
-
-
-cd $WD
-
-find . -name torrc -exec bash -c "$TOR -f $WD/{} &" \;
-
