@@ -1,8 +1,6 @@
 #!/bin/bash
 
-source ./config
-
-WD=`pwd`/work
+source common.sh
 
 mkdir -p $WD/authorities/
 mkdir -p $WD/relays/
