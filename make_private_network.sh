@@ -20,6 +20,7 @@ while [ $NUM -gt 0 ]; do
 	cd $path;
 	let ORPORT=3000+$NUM
 	let DIRPORT=4000+$NUM
+
 	cat <<-EOF >$path/torrc.tmp
 	DirServer test 127.0.0.1:1 0000000000000000000000000000000000000000
 	OrPort 1
@@ -33,12 +34,13 @@ while [ $NUM -gt 0 ]; do
 	# Make a dummy password for this authority
 	echo $NUM$NUM$NUM$NUM > password
 
-	exec 5<> password
-	$GENCERT --create-identity-key --passphrase-fd 5
-	exec 5>&-
+	if [ ! -f $path/authority_identity_key ]; then
+		exec 5<> password
+		$GENCERT --create-identity-key --passphrase-fd 5
+		exec 5>&-
 
-	mv authority_certificate authority_signing_key keys/
-
+		mv authority_certificate authority_signing_key keys/
+	fi
 	V3ID=`grep fingerprint keys/authority_certificate | cut -f 2 -d " "`;
 	
 	DIRSERVER_LINE="DirServer authority$NUM v3ident=$V3ID orport=$ORPORT \
