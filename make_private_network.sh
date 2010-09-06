@@ -55,12 +55,15 @@ TestingTorNetwork 1\n\
 DataDirectory \$path\n\
 RunAsDaemon 1\n\
 ConnLimit \$CONNLIMIT\n\
+Nickname \$type\$NUM\n\
+PidFile $WD/\$type\$NUM.pid\n\
 Log notice file \$path/notice.log"
 
 NUM=$AUTHORITIES
 while [ $NUM -gt 0 ]; do
 
-	path=$WD/authorities/auth$NUM;
+	type=auth
+	path=$WD/authorities/$type$NUM;
 	let ORPORT=3000+$NUM
 	let DIRPORT=4000+$NUM
 
@@ -88,7 +91,8 @@ done
 NUM=$RELAYS
 while [ $NUM -gt 0 ]; do
 
-	path=$WD/relays/relay$NUM;
+	type=relay
+	path=$WD/relays/$type$NUM;
 	mkdir -p $path;
 	cd $path
 	let ORPORT=5000+$NUM
@@ -114,7 +118,8 @@ done
 NUM=$CLIENTS
 while [ $NUM -gt 0 ]; do
 
-	path=$WD/clients/client$NUM;
+	type=client
+	path=$WD/clients/$type$NUM;
 	mkdir -p $path;
 	cd $path
 	
