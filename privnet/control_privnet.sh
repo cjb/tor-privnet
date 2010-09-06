@@ -15,26 +15,28 @@ if [ "$#" == "0" ]; then
 	print_usage
 fi
 
-action=$1
+action="$1"
 
 shift
 
 tors=
 PID=0
 
+cd "$WD"
+
 # No further arguments, act on all instances
 if [ "$#" == "0" ]; then
-for instance in $(find work/* -type d -maxdepth 1 -mindepth 1); do
-	inst=`basename -a $instance`
-	tors="$tors $inst"
-done
+	for instance in $(find ./* -type d -maxdepth 1 -mindepth 1); do
+		inst=`basename -a $instance`
+		tors="$tors $inst"
+	done
 fi
 
 while (( "$#" )); do
 
 	#Make sure we actually have a Tor instance for this
-	if [ ! -d $WD/*/$1 ]; then
-		echo "Can't find Tor instance $1. Ignoring." >&2
+	if [ ! -d "$WD/*/$1" ]; then
+		echo "Can't find Tor instance "$1". Ignoring." >&2
 	else
 	tors="$tors $1"
 	fi
@@ -46,8 +48,8 @@ done
 # Set $PID to pid of this tor instance or to 0 if there isnt one
 checkpid() {
 
-if [ -e $WD/$1.pid ]; then
-	pid=$(cat $WD/$1.pid)
+if [ -e "$WD/$1.pid" ]; then
+	pid=$(cat "$WD/$1.pid")
 	if ( kill -0 $pid );then
 		PID=$pid
 		return
@@ -63,9 +65,9 @@ for inst in $tors; do
 	if [ "$PID" != "0" ]; then
 		echo "Tor process $inst is already running. Not starting." >&2
 	else
-		cd $WD
+		cd "$WD"
 		echo "Starting Tor process $inst." >&2
-		find . -type d -name "$inst" -exec bash -c "$TOR --quiet -f $WD/{}/torrc &" \;
+		find . -type d -name $inst -exec bash -c "\"$TOR\" --quiet -f \"$WD/{}/torrc\" &" \;
 	fi
 done
 }
