@@ -20,6 +20,7 @@ action=$1
 shift
 
 tors=
+PID=0
 
 # No further arguments, act on all instances
 if [ "$#" == "0" ]; then
@@ -42,24 +43,24 @@ while (( "$#" )); do
 
 done
 
-# Return 1 if this tor is running, 0 if not.
+# Set $PID to pid of this tor instance or to 0 if there isnt one
 checkpid() {
 
 if [ -e $WD/$1.pid ]; then
 	pid=$(cat $WD/$1.pid)
 	if ( kill -0 $pid );then
 		PID=$pid
-		return 1
+		return
 	fi
 fi
-return 0
+PID=0
 }
 
 start() {
 
 for inst in $tors; do
 	checkpid "$inst"
-	if [ "$?" != "0" ]; then
+	if [ "$PID" != "0" ]; then
 		echo "Tor process $inst is already running. Not starting." >&2
 	else
 		cd $WD
@@ -71,9 +72,8 @@ done
 
 stop() {
 for inst in $tors; do
-	PID=0
 	checkpid "$inst"
-	if [ "$?" == "0" ]; then
+	if [ "$PID" == "0" ]; then
 		echo "Tor process $inst is not running. Not stopping." >&2
 	else
 		echo "Stopping Tor process $inst." >&2
@@ -84,9 +84,8 @@ done
 
 reload() {
 for inst in $tors; do
-	PID=0
 	checkpid "$inst"
-	if [ "$?" == "0" ]; then
+	if [ "$PID" == "0" ]; then
 		echo "Tor process $inst is not running. Not reloading." >&2
 	else
 		echo "Reloading Tor process $inst." >&2
@@ -97,9 +96,8 @@ done
 
 status() {
 for inst in $tors; do
-	PID=0
 	checkpid "$inst"
-	if [ "$?" == "0" ]; then
+	if [ "$PID" == "0" ]; then
 		echo "Tor process $inst is not running." >&2
 	else
 		echo "Tor process $inst is running with PID $PID" >&2

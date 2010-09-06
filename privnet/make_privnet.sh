@@ -44,7 +44,7 @@ while [ $NUM -gt 0 ]; do
 	DIRSERVER_LINE="DirServer authority$NUM v3ident=$V3ID orport=$ORPORT \
 no-v2 127.0.0.1:$DIRPORT $FP"$'\n'"$DIRSERVER_LINE";
 
-	let NUM=$NUM-1
+	let NUM=$NUM-1 || true
 done
 
 # Configure them
@@ -84,7 +84,7 @@ while [ $NUM -gt 0 ]; do
 	$DIRSERVER_LINE
 	EOF
 
-	let NUM=$NUM-1
+	let NUM=$NUM-1 || true
 done
 
 # Set up relays
@@ -111,7 +111,7 @@ while [ $NUM -gt 0 ]; do
 	$DIRSERVER_LINE
 	EOF
 
-	let NUM=$NUM-1
+	let NUM=$NUM-1 || true
 done
 
 # Set up clients
@@ -135,5 +135,5 @@ while [ $NUM -gt 0 ]; do
 	$DIRSERVER_LINE
 	EOF
 
-	let NUM=$NUM-1
+	let NUM=$NUM-1 || true
 done
