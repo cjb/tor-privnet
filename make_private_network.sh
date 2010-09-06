@@ -42,12 +42,20 @@ while [ $NUM -gt 0 ]; do
 	V3ID=`grep fingerprint keys/authority_certificate | cut -f 2 -d " "`;
 	
 	DIRSERVER_LINE="DirServer authority$NUM v3ident=$V3ID orport=$ORPORT \
-	no-v2 127.0.0.1:$DIRPORT $FP"$'\n'"$DIRSERVER_LINE";
+no-v2 127.0.0.1:$DIRPORT $FP"$'\n'"$DIRSERVER_LINE";
 
 	let NUM=$NUM-1
 done
 
 # Configure them
+
+# Set up the default shared config for all nodes
+SHARED_CONFIG="
+TestingTorNetwork 1\n\
+DataDirectory \$path\n\
+RunAsDaemon 1\n\
+ConnLimit \$CONNLIMIT\n\
+Log notice file \$path/notice.log"
 
 NUM=$AUTHORITIES
 while [ $NUM -gt 0 ]; do
@@ -57,17 +65,14 @@ while [ $NUM -gt 0 ]; do
 	let DIRPORT=4000+$NUM
 
 	# Make the config file
-	cat <<-EOF >$path/torrc
-	TestingTorNetwork 1
-	DataDirectory $path
-	Log notice file $path/notice.log
-	Nickname authority$NUM
-	RunAsDaemon 1
+	eval conf=\"$SHARED_CONFIG\"
+	echo -e $conf >$path/torrc
+
+	cat <<-EOF >>$path/torrc
 	SocksPort 0
 	OrPort $ORPORT
 	Address 127.0.0.1
 	DirPort $DIRPORT
-	ConnLimit $CONNLIMIT
 	AuthoritativeDirectory 1
 	V3AuthoritativeDirectory 1
 	ContactInfo auth$NUM@test.test
@@ -90,15 +95,12 @@ while [ $NUM -gt 0 ]; do
 	let DIRPORT=6000+$NUM
 
 	# Make the config file
-	cat <<-EOF >$path/torrc
-	TestingTorNetwork 1
-	DataDirectory $path
-	Log notice file $path/notice.log
-	Nickname relay$NUM
-	RunAsDaemon 1
+	eval conf=\"$SHARED_CONFIG\"
+	echo -e $conf >$path/torrc
+
+	cat <<-EOF >>$path/torrc
 	SocksPort 0
 	OrPort $ORPORT
-	ConnLimit $CONNLIMIT
 	Address 127.0.0.1
 	DirPort $DIRPORT
 	$DIRSERVER_LINE
@@ -119,12 +121,10 @@ while [ $NUM -gt 0 ]; do
 	let SOCKSPORT=10000+$NUM
 
 	# Make the config file
-	cat <<-EOF >$path/torrc
-	TestingTorNetwork 1
-	DataDirectory $path
-	RunAsDaemon 1
-	ConnLimit $CONNLIMIT
-	Log notice file $path/notice.log
+	eval conf=\"$SHARED_CONFIG\"
+	echo -e $conf >$path/torrc
+
+	cat <<-EOF >>$path/torrc
 	SocksPort $SOCKSPORT
 	$DIRSERVER_LINE
 	EOF
