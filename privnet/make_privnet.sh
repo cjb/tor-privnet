@@ -56,6 +56,7 @@ DataDirectory \$path\n\
 RunAsDaemon 1\n\
 ConnLimit \$CONNLIMIT\n\
 Nickname \$type\$NUM\n\
+ShutdownWaitLength 0\n\
 PidFile $WD/\$type\$NUM.pid\n\
 Log notice file \$path/notice.log"
 
