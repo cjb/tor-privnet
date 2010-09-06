@@ -26,8 +26,8 @@ cd "$WD"
 
 # No further arguments, act on all instances
 if [ "$#" == "0" ]; then
-	for instance in $(find ./* -type d -maxdepth 1 -mindepth 1); do
-		inst=`basename -a $instance`
+	for instance in $(find ./* -maxdepth 1 -mindepth 1 -type d); do
+		inst=`basename $instance`
 		tors="$tors $inst"
 	done
 fi
@@ -35,8 +35,9 @@ fi
 while (( "$#" )); do
 
 	#Make sure we actually have a Tor instance for this
-	if [ ! -d "$WD/*/$1" ]; then
-		echo "Can't find Tor instance "$1". Ignoring." >&2
+	if [ ! -d "$WD/authorities/$1" -a ! -d "$WD/relays/$1" -a \
+		! "$WD/clients/$1" ]; then
+	echo "Can't find Tor instance "$1". Ignoring." >&2
 	else
 	tors="$tors $1"
 	fi
